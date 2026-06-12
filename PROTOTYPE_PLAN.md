@@ -23,6 +23,14 @@ Target: the 10–15 minute vertical slice **"The Mouth"** (design doc §10–11,
 - [ ] **Phase 9 — Tunnel Chase**: forced escape, obstacles, flashlight cones.
 - [ ] **Phase 10 — Bedroom Playback**: TV/VCR cutscene, Eli message, end card.
 
+## Feel backlog (from Devin's playtests)
+
+- [ ] **Push timing skill**: kick rhythm should matter, not just kick count —
+  e.g. a slightly stronger kick when timed near the top of the roll (as the
+  previous kick's burst decays), like EA Skate's push cadence. Current state:
+  tap-to-push at flat 185 impulse, 0.3 s cooldown, 540 cap, slopes required to
+  exceed it. Keep the cap physical; reward timing inside it.
+
 ## Rules
 
 - Every feature must serve the vertical slice or go to the backlog (design doc §27).
