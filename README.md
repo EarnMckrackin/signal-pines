@@ -7,8 +7,10 @@ Full design: [`SIGNAL_PINES_DESIGN_PLAN.md`](SIGNAL_PINES_DESIGN_PLAN.md)
 
 ## Status
 
-**Phase 1–2: skate feel sandbox + Mercy Hill graybox route.**
-Everything is placeholder rectangles on purpose — movement feel comes before art.
+**Phases 1–5: skate sandbox, Mercy Hill route, grind rails, Zip's dialogue hub,
+camcorder.** Everything is placeholder rectangles on purpose — movement feel
+comes before art. The door past the Mercy Hill finish gate leads to Zip's:
+talk to the crew, get the camcorder from Eli, film the Northstar flyer.
 
 ## Run it
 
@@ -30,6 +32,8 @@ Requires Godot 4.x (`brew install --cask godot`).
 | Space | Ollie (hold to crouch + charge, release to pop) |
 | S / Down | Brake; at speed, powerslide |
 | F | Mount / dismount board |
+| E | Talk / interact / hold to record |
+| C | Raise camcorder (once Eli gives it to you) |
 | R | Reset to start |
 | F3 | Toggle debug overlay |
 

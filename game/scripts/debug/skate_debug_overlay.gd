@@ -21,7 +21,7 @@ func _process(_delta: float) -> void:
 	var charge_pct := 0.0
 	if _player.tuning.crouch_charge_time > 0.0:
 		charge_pct = 100.0 * _player.crouch_charge / _player.tuning.crouch_charge_time
-	_label.text = "state: %s\nspeed: %.0f\nvel: (%.0f, %.0f)\ngrounded: %s\nfacing: %d\ncharge: %.0f%%\ngrind: %s\nfps: %d" % [
+	_label.text = "state: %s\nspeed: %.0f\nvel: (%.0f, %.0f)\ngrounded: %s\nfacing: %d\ncharge: %.0f%%\ngrind: %s\nflags: %s\nevidence: %s\nfps: %d" % [
 		SkateState.NAMES.get(_player.state, "?"),
 		_player.velocity.length(),
 		_player.velocity.x, _player.velocity.y,
@@ -29,6 +29,8 @@ func _process(_delta: float) -> void:
 		_player.facing,
 		charge_pct,
 		_grind_text(),
+		", ".join(GameState.flags.keys()) if not GameState.flags.is_empty() else "-",
+		", ".join(GameState.evidence) if not GameState.evidence.is_empty() else "-",
 		Engine.get_frames_per_second(),
 	]
 	_highlight_rail(_grind_target())

@@ -7,6 +7,10 @@ config/name="Signal Pines"
 run/main_scene="res://scenes/routes/MercyHill.tscn"
 config/features=PackedStringArray("4.6")
 
+[autoload]
+
+GameState="*res://scripts/core/game_state.gd"
+
 [display]
 
 window/size/viewport_width=1280
@@ -47,6 +51,10 @@ interact={
 reset={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":82), Object(InputEventJoypadButton,"device":-1,"button_index":4)]
+}
+camcorder={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":67), Object(InputEventJoypadMotion,"device":-1,"axis":4,"axis_value":1.0)]
 }
 debug_toggle={
 "deadzone": 0.5,

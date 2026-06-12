@@ -63,6 +63,12 @@ func _build_route() -> void:
 
 	_finish_area(Vector2(4450, 675))
 
+	var gate := SceneGate.new()
+	gate.target_scene = "res://scenes/routes/ZipsDiner.tscn"
+	gate.label_text = "Zip's Diner"
+	gate.position = Vector2(4300, 675)
+	add_child(gate)
+
 
 func _segment(start: Vector2, angle_deg: float, length: float, color: Color,
 		label := "", one_way := false, thickness := 40.0) -> Vector2:

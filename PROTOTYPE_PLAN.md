@@ -11,8 +11,12 @@ Target: the 10–15 minute vertical slice **"The Mouth"** (design doc §10–11,
   follow. *Awaiting human feel pass — Milestone A/B acceptance is played, not read.*
 - [x] **Phase 3 — Grind and Route Mastery**: grind detection, snap tolerance,
   grind state, exit, debug grind target. *Awaiting human feel pass.*
-- [ ] **Phase 4 — Zip's + Dialogue Hub**: NPC placeholders, dialogue box, rumor flags.
-- [ ] **Phase 5 — Camcorder Tool**: aim/record, evidence targets, captured flags.
+- [x] **Phase 4 — Zip's + Dialogue Hub**: NPC placeholders, dialogue box with
+  branching choices, rumor flags, objective flow, scene gate from Mercy Hill.
+  *Awaiting human pass on dialogue pacing/tone.*
+- [x] **Phase 5 — Camcorder Tool**: [C] viewfinder, evidence targets, hold-[E]
+  record with progress, captured flags in GameState, debug evidence list.
+  *First real use (Eli's trick + glitch) lands with Phase 6's Spillway.*
 - [ ] **Phase 6 — Spillway Scene**: The Mouth entrance, trick filming, first glitch.
 - [ ] **Phase 7 — Tunnel Traversal**: dismount/carry/crawl/climb, door wedge.
 - [ ] **Phase 8 — Stealth Follow**: guard patrol, detection cone, hide zones, reveal.

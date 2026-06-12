@@ -37,6 +37,7 @@ var _jump_buffer := 0.0
 var _state_timer := 0.0
 var _was_on_floor := false
 var _airborne_on_foot := false
+var _pre_interact_on_foot := false
 var _pre_move_velocity := Vector2.ZERO
 
 @onready var _visual: Node2D = $Visual
@@ -53,7 +54,7 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if Input.is_action_just_pressed("reset"):
+	if Input.is_action_just_pressed("reset") and state != SkateState.INTERACTING:
 		respawn()
 		return
 
@@ -73,6 +74,8 @@ func _physics_process(delta: float) -> void:
 			_process_airborne(delta)
 		SkateState.GRINDING:
 			_process_grinding(delta)
+		SkateState.INTERACTING:
+			_process_interacting(delta)
 		SkateState.BAILING:
 			_process_bailing(delta)
 		SkateState.RECOVERING:
@@ -232,6 +235,14 @@ func _process_on_foot(delta: float) -> void:
 		velocity.y = minf(velocity.y + tuning.gravity * delta, tuning.max_fall_speed)
 
 
+func _process_interacting(delta: float) -> void:
+	# Dialogue / camcorder lock: coast to a stop, no input.
+	if is_on_floor():
+		velocity.x = move_toward(velocity.x, 0.0, tuning.brake_friction * delta)
+	else:
+		velocity.y = minf(velocity.y + tuning.gravity * delta, tuning.max_fall_speed)
+
+
 func _process_bailing(delta: float) -> void:
 	velocity.y = minf(velocity.y + tuning.gravity * delta, tuning.max_fall_speed)
 	if is_on_floor():
@@ -250,6 +261,34 @@ func _process_recovering(delta: float) -> void:
 	if _state_timer <= 0.0:
 		_ground_speed = velocity.dot(_surface_dir())
 		_set_state(SkateState.SKATING)
+
+
+# --- External control (dialogue, camcorder, scene scripts) -------------------
+
+
+func begin_interaction() -> void:
+	_pre_interact_on_foot = state == SkateState.ON_FOOT
+	crouch_charge = 0.0
+	_set_state(SkateState.INTERACTING)
+
+
+func end_interaction() -> void:
+	if state != SkateState.INTERACTING:
+		return
+	if _pre_interact_on_foot:
+		_set_state(SkateState.ON_FOOT)
+	else:
+		_ground_speed = velocity.dot(_surface_dir())
+		_set_state(SkateState.SKATING)
+
+
+func is_busy() -> bool:
+	return state == SkateState.INTERACTING
+
+
+func set_on_foot() -> void:
+	# For indoor scenes that start off the board.
+	_set_state(SkateState.ON_FOOT)
 
 
 # --- Transitions ------------------------------------------------------------
@@ -376,4 +415,6 @@ func _update_visual(delta: float) -> void:
 	var crouched := state == SkateState.CROUCHING or state == SkateState.POWERSLIDING
 	_body_poly.scale.y = lerpf(_body_poly.scale.y, 0.6 if crouched else 1.0, 14.0 * delta)
 	# TODO(Phase 7): show the board carried under the arm instead of hiding it.
-	_board.visible = state != SkateState.ON_FOOT
+	var on_foot := state == SkateState.ON_FOOT \
+			or (state == SkateState.INTERACTING and _pre_interact_on_foot)
+	_board.visible = not on_foot
