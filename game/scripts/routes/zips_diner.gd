@@ -1,7 +1,7 @@
 extends Node2D
 ## Zip's Diner & Arcade (Phase 4): graybox interior, the crew, the deputy,
-## and the Northstar flyer (Phase 5 camcorder target). Mission flow lives
-## here for now; a reusable MissionController arrives with Phase 6.
+## and the Northstar flyer (Phase 5 camcorder target). Each route keeps its
+## own small mission flow; extract a shared controller only if they converge.
 
 const COL_FLOOR := Color(0.3, 0.27, 0.24)
 const COL_WALL := Color(0.16, 0.14, 0.16)

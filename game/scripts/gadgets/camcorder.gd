@@ -3,11 +3,12 @@ extends Node
 ## Eli's camcorder (Phase 5). Toggle with [C] once GameState has
 ## "has_camcorder". Raising it locks movement (player INTERACTING); hold the
 ## interact key on a framed EvidenceTarget to record it into GameState.
-## Phase 6 hook: signal zones will glitch the viewfinder via apply_glitch().
+## Signal zones (Phase 6) tear the viewfinder up via apply_glitch().
 
 const RECORD_TIME := 1.2
 const RECORD_RANGE := 320.0
 const STILL_SPEED := 80.0
+const GLITCH_BARS := 8
 
 var active := false
 
@@ -18,6 +19,9 @@ var _info: Label
 var _progress := 0.0
 var _flash := 0.0
 var _target: EvidenceTarget
+var _glitch_time := 0.0
+var _glitch_root: Control
+var _glitch_bars: Array[ColorRect] = []
 
 
 func _ready() -> void:
@@ -33,6 +37,14 @@ func _process(delta: float) -> void:
 			_activate()
 
 	if not active:
+		return
+
+	if _glitch_time > 0.0:
+		_glitch_time -= delta
+		_scramble_glitch()
+		if _glitch_time <= 0.0:
+			_glitch_root.visible = false
+			_info.text = ""
 		return
 
 	# Blinking REC dot, like every tape Eli ever labeled wrong.
@@ -81,7 +93,31 @@ func _activate() -> void:
 func _deactivate() -> void:
 	active = false
 	_layer.visible = false
+	_glitch_time = 0.0
+	_glitch_root.visible = false
 	_player.end_interaction()
+
+
+func apply_glitch(duration := 1.2) -> void:
+	# Signal interference: the viewfinder tears into static bars and input is
+	# ignored until it clears. World-side effects are the route's job.
+	if not active or _glitch_time > 0.0:
+		return
+	_glitch_time = duration
+	_flash = 0.0
+	_glitch_root.visible = true
+
+
+func _scramble_glitch() -> void:
+	var view := _glitch_root.get_viewport_rect().size
+	for bar in _glitch_bars:
+		bar.position = Vector2(randf_range(-30.0, 30.0), randf() * view.y)
+		bar.size = Vector2(view.x + 60.0, randf_range(3.0, 16.0))
+		var bright := randf() < 0.5
+		bar.color = Color(1, 1, 1, randf_range(0.3, 0.8)) if bright \
+				else Color(0.02, 0.02, 0.05, randf_range(0.5, 0.9))
+	_rec.visible = randf() < 0.5
+	_info.text = "%%# SIGNAL #%%" if randf() < 0.7 else ""
 
 
 func _find_target() -> EvidenceTarget:
@@ -166,3 +202,13 @@ func _build_viewfinder() -> void:
 	_info.offset_top = -100.0
 	_info.offset_bottom = -76.0
 	root.add_child(_info)
+
+	_glitch_root = Control.new()
+	_glitch_root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_glitch_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_glitch_root.visible = false
+	root.add_child(_glitch_root)
+	for i in GLITCH_BARS:
+		var bar := ColorRect.new()
+		_glitch_root.add_child(bar)
+		_glitch_bars.append(bar)

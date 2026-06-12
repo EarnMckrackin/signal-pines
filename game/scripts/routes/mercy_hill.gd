@@ -69,6 +69,15 @@ func _build_route() -> void:
 	gate.position = Vector2(4300, 675)
 	add_child(gate)
 
+	# The Spillway opens once the crew at Zip's has set up the shoot.
+	var spillway := SceneGate.new()
+	spillway.target_scene = "res://scenes/routes/Spillway.tscn"
+	spillway.label_text = "The Spillway"
+	spillway.required_flag = "mission_zips_done"
+	spillway.locked_text = "(find the crew at Zip's first)"
+	spillway.position = Vector2(4120, 675)
+	add_child(spillway)
+
 
 func _segment(start: Vector2, angle_deg: float, length: float, color: Color,
 		label := "", one_way := false, thickness := 40.0) -> Vector2:

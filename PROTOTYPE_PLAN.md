@@ -17,7 +17,10 @@ Target: the 10–15 minute vertical slice **"The Mouth"** (design doc §10–11,
 - [x] **Phase 5 — Camcorder Tool**: [C] viewfinder, evidence targets, hold-[E]
   record with progress, captured flags in GameState, debug evidence list.
   *First real use (Eli's trick + glitch) lands with Phase 6's Spillway.*
-- [ ] **Phase 6 — Spillway Scene**: The Mouth entrance, trick filming, first glitch.
+- [x] **Phase 6 — Spillway Scene**: dusk-mood-blocked canal, The Mouth (humming
+  arch + entry zone), Eli's filmed trick, camcorder glitch + ghost anomaly,
+  walkie tone event, Eli enters tunnel, end card. *Awaiting human pass on mood
+  and scare readability.*
 - [ ] **Phase 7 — Tunnel Traversal**: dismount/carry/crawl/climb, door wedge.
 - [ ] **Phase 8 — Stealth Follow**: guard patrol, detection cone, hide zones, reveal.
 - [ ] **Phase 9 — Tunnel Chase**: forced escape, obstacles, flashlight cones.

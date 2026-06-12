@@ -6,6 +6,9 @@ const USE_RANGE := 90.0
 
 var target_scene := ""
 var label_text := "Enter"
+# When set, the gate stays shut until GameState has the flag.
+var required_flag := ""
+var locked_text := "(locked)"
 
 var _player: PlayerController
 var _prompt: Label
@@ -39,6 +42,9 @@ func _process(_delta: float) -> void:
 		if _player == null:
 			return
 	var near := global_position.distance_to(_player.global_position) < USE_RANGE
+	var unlocked := required_flag.is_empty() or GameState.has_flag(required_flag)
+	_prompt.text = "[E] enter" if unlocked else locked_text
 	_prompt.visible = near and not _player.is_busy()
-	if near and not _player.is_busy() and Input.is_action_just_pressed("interact"):
+	if near and unlocked and not _player.is_busy() \
+			and Input.is_action_just_pressed("interact"):
 		get_tree().change_scene_to_file(target_scene)

@@ -1,14 +1,18 @@
 class_name EvidenceTarget
 extends Node2D
 ## Something the camcorder can capture. Dims once it's on tape.
+## With show_visual off it's a pure filming hotspot (e.g. parented to an NPC).
 
 var evidence_id := ""
 var display_name := ""
 var color := Color(0.95, 0.9, 0.55)
+var show_visual := true
 
 
 func _ready() -> void:
 	add_to_group("evidence")
+	if not show_visual:
+		return
 	var paper := Polygon2D.new()
 	paper.color = color
 	paper.polygon = PackedVector2Array([
