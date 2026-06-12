@@ -168,7 +168,7 @@ func _build_hud() -> void:
 	layer.add_child(_hud_label)
 
 	var hint := Label.new()
-	hint.text = "[W] push   [Space] ollie (hold = charge)   [S] brake/slide   [F] on/off board   [R] reset   [F3] debug"
+	hint.text = "[W] tap to push   [Space] ollie (hold = charge)   [S] brake/slide/grind   [F] walk or ride   [R] reset   [F3] debug"
 	hint.position = Vector2(180, 690)
 	hint.modulate = Color(1, 1, 1, 0.5)
 	layer.add_child(hint)

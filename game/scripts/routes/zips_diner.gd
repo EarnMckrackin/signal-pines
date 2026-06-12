@@ -166,12 +166,16 @@ func _wall(center: Vector2) -> void:
 func _backdrop(center: Vector2, size: Vector2) -> void:
 	var poly := _rect_poly(size, COL_BACKDROP)
 	poly.position = center
+	# Behind everything: the Player node sits earlier in the tree than this
+	# code-built geometry, so without an explicit z it would be painted over.
+	poly.z_index = -10
 	add_child(poly)
 
 
 func _decor(center: Vector2, size: Vector2, color: Color, label: String) -> void:
 	var poly := _rect_poly(size, color)
 	poly.position = center
+	poly.z_index = -5
 	add_child(poly)
 	if label != "":
 		var l := Label.new()

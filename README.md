@@ -27,7 +27,7 @@ Requires Godot 4.x (`brew install --cask godot`).
 
 | Key | Action |
 |---|---|
-| W / Up | Push |
+| W / Up | Push — one kick per tap, EA Skate style |
 | A / D / arrows | Lean / steer |
 | Space | Ollie (hold to crouch + charge, release to pop) |
 | S / Down | Brake; at speed, powerslide |

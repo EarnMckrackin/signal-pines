@@ -4,8 +4,9 @@ extends Resource
 ## sessions never touch movement logic. Save variants as .tres to A/B feels.
 
 @export_group("Push")
-@export var push_impulse := 150.0
-@export var push_interval := 0.35
+## One kick per button press (EA Skate style), so each tap counts for more.
+@export var push_impulse := 185.0
+@export var push_interval := 0.3
 @export var max_push_speed := 540.0
 @export var absolute_max_speed := 950.0
 @export var lean_accel := 170.0
@@ -56,6 +57,6 @@ extends Resource
 @export var recover_duration := 0.3
 
 @export_group("On Foot")
-@export var walk_speed := 190.0
+@export var walk_speed := 220.0
 @export var walk_accel := 1500.0
 @export var foot_jump_force := 430.0

@@ -132,7 +132,9 @@ func _process_skating(delta: float) -> void:
 		if state == SkateState.POWERSLIDING:
 			_set_state(SkateState.SKATING)
 		speed = move_toward(speed, 0.0, tuning.ground_friction * delta)
-		if Input.is_action_pressed("push") and _push_cooldown == 0.0 \
+		# Skate-style: each press is one deliberate kick (no auto-push on hold);
+		# the cooldown just keeps mashing from beating a real push rhythm.
+		if Input.is_action_just_pressed("push") and _push_cooldown == 0.0 \
 				and absf(speed) < tuning.max_push_speed:
 			speed = clampf(speed + facing * tuning.push_impulse,
 					-tuning.max_push_speed, tuning.max_push_speed)
@@ -414,7 +416,11 @@ func _update_visual(delta: float) -> void:
 
 	var crouched := state == SkateState.CROUCHING or state == SkateState.POWERSLIDING
 	_body_poly.scale.y = lerpf(_body_poly.scale.y, 0.6 if crouched else 1.0, 14.0 * delta)
-	# TODO(Phase 7): show the board carried under the arm instead of hiding it.
+	# On foot the board tucks under the arm instead of vanishing — walking is
+	# real traversal, and the board staying visible keeps it central.
 	var on_foot := state == SkateState.ON_FOOT \
 			or (state == SkateState.INTERACTING and _pre_interact_on_foot)
-	_board.visible = not on_foot
+	var board_pos := Vector2(-13, -14) if on_foot else Vector2(0, 24)
+	var board_rot := 1.25 if on_foot else 0.0
+	_board.position = _board.position.lerp(board_pos, 14.0 * delta)
+	_board.rotation = lerp_angle(_board.rotation, board_rot, 14.0 * delta)

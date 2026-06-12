@@ -1,5 +1,5 @@
 extends Node
-## Headless smoke test: holds push down Mercy Hill, ollies the curb, then
+## Headless smoke test: taps push down Mercy Hill, ollies the curb, then
 ## ollies onto the rail over The Drop, grinds it (hold brake in air), ollies
 ## off, lands, and reports whether the finish gate fired. Run with:
 ##   Godot --headless --path game res://tests/SimTest.tscn
@@ -29,7 +29,6 @@ func _ready() -> void:
 	add_child(route)
 	player = route.get_node("Player")
 	player.state_changed.connect(_on_state_changed)
-	Input.action_press("push")
 
 
 func _on_state_changed(previous: int, current: int) -> void:
@@ -45,6 +44,13 @@ func _on_state_changed(previous: int, current: int) -> void:
 
 func _physics_process(delta: float) -> void:
 	t += delta
+
+	# Push is one kick per press now, so tap it every ~0.25 s like a player.
+	var f := Engine.get_physics_frames() % 30
+	if f == 0:
+		Input.action_press("push")
+	elif f == 3:
+		Input.action_release("push")
 
 	# Charge an ollie before the curb at x=2000, release after 0.35 s.
 	if not jump_started and player.global_position.x > 1550.0 and player.is_on_floor():
