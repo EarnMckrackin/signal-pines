@@ -9,8 +9,8 @@ Target: the 10–15 minute vertical slice **"The Mouth"** (design doc §10–11,
 - [x] **Phase 2 — Mercy Hill Route** (graybox): sloped street, curb, rail
   placeholder, risky one-way upper line, start checkpoint, finish trigger, camera
   follow. *Awaiting human feel pass — Milestone A/B acceptance is played, not read.*
-- [ ] **Phase 3 — Grind and Route Mastery**: grind detection, snap tolerance,
-  grind state, exit, debug grind target.
+- [x] **Phase 3 — Grind and Route Mastery**: grind detection, snap tolerance,
+  grind state, exit, debug grind target. *Awaiting human feel pass.*
 - [ ] **Phase 4 — Zip's + Dialogue Hub**: NPC placeholders, dialogue box, rumor flags.
 - [ ] **Phase 5 — Camcorder Tool**: aim/record, evidence targets, captured flags.
 - [ ] **Phase 6 — Spillway Scene**: The Mouth entrance, trick filming, first glitch.

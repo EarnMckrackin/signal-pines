@@ -33,6 +33,22 @@ extends Resource
 @export_group("Powerslide")
 @export var powerslide_min_speed := 220.0
 
+@export_group("Grind")
+## How close (px) the board must be to a rail to snap on while holding brake.
+@export var grind_snap_distance := 34.0
+## Fraction of the along-rail velocity kept when snapping onto the rail.
+@export var grind_entry_retention := 0.9
+## Speed decay along the rail (px/s^2). Lower than ground_friction so rails
+## read as the fast line; slope gravity still applies on angled rails.
+@export var grind_friction := 30.0
+## Upward pop when ollieing out of a grind.
+@export var grind_exit_force := 430.0
+## Lockout after leaving a rail before it can be grabbed again, so the exit
+## pop does not immediately re-snap.
+@export var grind_regrab_time := 0.25
+## Player origin height above the rail line while grinding (board contact).
+@export var grind_ride_height := 27.0
+
 @export_group("Bail")
 ## Hitting a wall faster than this triggers a bail instead of a stop.
 @export var bail_impact_speed := 430.0

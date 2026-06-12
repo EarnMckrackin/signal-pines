@@ -55,12 +55,11 @@ func _build_route() -> void:
 	_box(Vector2(-340, -150), Vector2(40, 300), COL_OBSTACLE)
 	_box(Vector2(p.x + 20, p.y - 150), Vector2(40, 300), COL_OBSTACLE)
 
-	# Risky/style line: one-way platforms above the safe ground. The ledge
-	# needs a charged ollie off the hill; the rail is the Phase 3 grind target,
-	# skateable as a narrow platform for now. Falling off just drops you back
-	# to the safe line.
+	# Risky/style line: a one-way ledge above the safe ground, then a grindable
+	# rail. The rail has no collision — hold brake in the air near it to snap
+	# on; missing it just drops you back to the safe line below.
 	_segment(Vector2(1750, 150), 0.0, 400.0, COL_RISKY, "Ledge (risky)", true, 14.0)
-	_segment(Vector2(2350, 190), 18.0, 900.0, COL_RAIL, "Rail (grind in Phase 3)", true, 10.0)
+	_grind_rail(Vector2(2350, 190), 18.0, 900.0, "Rail (hold S in air to grind)")
 
 	_finish_area(Vector2(4450, 675))
 
@@ -93,6 +92,21 @@ func _segment(start: Vector2, angle_deg: float, length: float, color: Color,
 
 	add_child(body)
 	return start + dir * length
+
+
+func _grind_rail(start: Vector2, angle_deg: float, length: float, label := "") -> void:
+	var rail: GrindRail = preload("res://scenes/rails/GrindRail.tscn").instantiate()
+	rail.position = start
+	rail.rotation = deg_to_rad(angle_deg)
+	rail.end_point = Vector2(length, 0.0)
+	rail.color = COL_RAIL
+	if label != "":
+		var l := Label.new()
+		l.text = label
+		l.position = Vector2(0.0, -40.0)
+		l.modulate = Color(1, 1, 1, 0.45)
+		rail.add_child(l)
+	add_child(rail)
 
 
 func _box(center: Vector2, size: Vector2, color: Color) -> void:
