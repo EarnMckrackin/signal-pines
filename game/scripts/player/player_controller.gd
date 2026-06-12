@@ -21,6 +21,11 @@ var grind_rail: GrindRail
 var nearest_rail: GrindRail
 var nearest_rail_distance := INF
 
+# Playtest telemetry, public for the debug overlay.
+var last_landing_speed_in := 0.0
+var last_landing_speed_out := 0.0
+var last_bail_reason := ""
+
 # Signed speed along the floor surface (+ = screen right). Authoritative while
 # grounded: move_and_slide() flattens velocity.y on slopes, so re-deriving
 # speed from velocity every frame would silently bleed it away.
@@ -338,7 +343,8 @@ func _update_nearest_rail() -> void:
 			nearest_rail_distance = d
 
 
-func _bail() -> void:
+func _bail(reason := "") -> void:
+	last_bail_reason = reason
 	if grind_rail != null:
 		grind_rail = null
 		_grind_regrab_timer = tuning.grind_regrab_time
@@ -356,8 +362,12 @@ func _after_move() -> void:
 			_airborne_on_foot = false
 			_set_state(SkateState.ON_FOOT)
 		else:
-			# Landing keeps the along-surface component of the fall.
-			_ground_speed = velocity.dot(_surface_dir())
+			# Landing keeps the along-surface component of the fall, scaled by
+			# the retention tunable.
+			var landing_in := velocity.dot(_surface_dir())
+			_ground_speed = landing_in * tuning.landing_speed_retention
+			last_landing_speed_in = absf(landing_in)
+			last_landing_speed_out = absf(_ground_speed)
 			_set_state(SkateState.SKATING)
 			if _jump_buffer > 0.0:
 				_ollie()
@@ -370,7 +380,7 @@ func _after_move() -> void:
 			var n := col.get_normal()
 			if absf(n.x) > 0.7:
 				if _pre_move_velocity.dot(n) < -tuning.bail_impact_speed:
-					_bail()
+					_bail("wall slam @ %.0f px/s" % -_pre_move_velocity.dot(n))
 				else:
 					_ground_speed = 0.0
 					_grind_speed = 0.0

@@ -21,19 +21,39 @@ func _process(_delta: float) -> void:
 	var charge_pct := 0.0
 	if _player.tuning.crouch_charge_time > 0.0:
 		charge_pct = 100.0 * _player.crouch_charge / _player.tuning.crouch_charge_time
-	_label.text = "state: %s\nspeed: %.0f\nvel: (%.0f, %.0f)\ngrounded: %s\nfacing: %d\ncharge: %.0f%%\ngrind: %s\nflags: %s\nevidence: %s\nfps: %d" % [
+	_label.text = "state: %s\nspeed: %.0f\nvel: (%.0f, %.0f)\ngrounded: %s\nslope: %s\nlean: %.1f\nfacing: %d\ncharge: %.0f%%\nlanding: %s\nbail: %s\ngrind: %s\nflags: %s\nevidence: %s\nfps: %d" % [
 		SkateState.NAMES.get(_player.state, "?"),
 		_player.velocity.length(),
 		_player.velocity.x, _player.velocity.y,
 		_player.is_on_floor(),
+		_slope_text(),
+		Input.get_axis("lean_left", "lean_right"),
 		_player.facing,
 		charge_pct,
+		_landing_text(),
+		_player.last_bail_reason if _player.last_bail_reason != "" else "-",
 		_grind_text(),
 		", ".join(GameState.flags.keys()) if not GameState.flags.is_empty() else "-",
 		", ".join(GameState.evidence) if not GameState.evidence.is_empty() else "-",
 		Engine.get_frames_per_second(),
 	]
 	_highlight_rail(_grind_target())
+
+
+func _slope_text() -> String:
+	if not _player.is_on_floor():
+		return "-"
+	return "%.0f°" % rad_to_deg(_player.get_floor_normal().angle_to(Vector2.UP))
+
+
+func _landing_text() -> String:
+	if _player.last_landing_speed_in <= 0.0:
+		return "-"
+	return "%.0f → %.0f (%.0f%% kept)" % [
+		_player.last_landing_speed_in,
+		_player.last_landing_speed_out,
+		100.0 * _player.last_landing_speed_out / _player.last_landing_speed_in,
+	]
 
 
 func _grind_target() -> GrindRail:

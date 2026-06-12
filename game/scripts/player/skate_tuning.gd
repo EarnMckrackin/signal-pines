@@ -31,6 +31,10 @@ extends Resource
 @export var jump_buffer_time := 0.12
 @export var air_control := 650.0
 
+@export_group("Landing")
+## Fraction of along-surface speed kept on touchdown (1.0 = lossless).
+@export var landing_speed_retention := 1.0
+
 @export_group("Powerslide")
 @export var powerslide_min_speed := 220.0
 
@@ -60,3 +64,14 @@ extends Resource
 @export var walk_speed := 220.0
 @export var walk_accel := 1500.0
 @export var foot_jump_force := 430.0
+
+@export_group("Tunnel (Phase 7)")
+@export var crawl_speed := 85.0
+@export var climb_speed := 120.0
+## Horizontal control while on a climbable surface.
+@export var climb_drift := 70.0
+## Extra rolling friction in standing water (px/s^2 on top of ground_friction).
+@export var wet_drag := 220.0
+## Multipliers while in water: push kick strength and walk/crawl speed.
+@export var wet_push_factor := 0.6
+@export var wet_walk_factor := 0.65

@@ -1,7 +1,6 @@
 class_name SkateState
 extends RefCounted
 ## Movement state ids shared by the player controller and debug tooling.
-## Later phases plug in here: GRINDING (Phase 3), CLIMBING/INTERACTING (Phase 7+).
 
 enum {
 	ON_FOOT,
@@ -14,6 +13,7 @@ enum {
 	GRINDING,
 	MOUNTING,
 	CLIMBING,
+	CRAWLING,
 	INTERACTING,
 }
 
@@ -28,5 +28,6 @@ const NAMES := {
 	GRINDING: "Grinding",
 	MOUNTING: "Mounting",
 	CLIMBING: "Climbing",
+	CRAWLING: "Crawling",
 	INTERACTING: "Interacting",
 }

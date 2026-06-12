@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/camera/cinematic_camera.gd" id="2"]
 [ext_resource type="Script" path="res://scripts/debug/skate_debug_overlay.gd" id="3"]
 [ext_resource type="Script" path="res://scripts/gadgets/camcorder.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/debug/tuning_panel.gd" id="5"]
 
 [sub_resource type="CapsuleShape2D" id="cap"]
 radius = 12.0
@@ -43,3 +44,7 @@ offset_top = 12.0
 [node name="Label" type="Label" parent="DebugOverlay/Panel"]
 layout_mode = 2
 text = "debug"
+
+[node name="TuningPanel" type="CanvasLayer" parent="."]
+visible = false
+script = ExtResource("5")
