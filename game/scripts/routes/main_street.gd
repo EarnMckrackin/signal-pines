@@ -21,7 +21,7 @@ var _objective: Label
 
 
 func _ready() -> void:
-	_build_mood()
+	_build_atmosphere()
 	_build_route()
 	add_child(DialogueBox.new())
 	_build_hud()
@@ -40,12 +40,12 @@ func _current_objective() -> String:
 # --- Mood -------------------------------------------------------------------
 
 
-func _build_mood() -> void:
-	# Early-dusk wash, between Mercy Hill (day) and the Spillway (full dusk).
-	var sky := _rect_poly(Vector2(7000, 1200), COL_DUSK)
-	sky.position = Vector2(2800, 0)
-	sky.z_index = -20
-	add_child(sky)
+func _build_atmosphere() -> void:
+	# Shared atmosphere system: parallax depth, particles, dusk grade. Replaces
+	# the old flat dusk rectangle. Palette lives in RoutePalettes.
+	var atmo := Atmosphere.new()
+	atmo.config = RoutePalettes.main_street()
+	add_child(atmo)
 
 
 # --- Layout -----------------------------------------------------------------

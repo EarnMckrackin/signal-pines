@@ -64,6 +64,10 @@ tuning_toggle={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":4194335)]
 }
+atmosphere_toggle={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":4194336)]
+}
 
 [physics]
 

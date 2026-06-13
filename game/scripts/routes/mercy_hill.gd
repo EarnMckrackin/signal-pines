@@ -20,8 +20,15 @@ var _hud_label: Label
 
 
 func _ready() -> void:
+	_build_atmosphere()
 	_build_route()
 	_build_hud()
+
+
+func _build_atmosphere() -> void:
+	var atmo := Atmosphere.new()
+	atmo.config = RoutePalettes.mercy_hill()
+	add_child(atmo)
 
 
 func _process(delta: float) -> void:

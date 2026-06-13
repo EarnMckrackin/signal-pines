@@ -6,10 +6,8 @@ extends Node2D
 ## routes, but this scene also carries the first mood-blocking pass: dusk
 ## palette, treeline silhouettes, fog, and the humming Mouth.
 
-# Dusk palette (design doc §5, "Color worlds — Dusk").
-const COL_SKY := Color(0.09, 0.08, 0.17)
-const COL_EMBER := Color(0.38, 0.18, 0.11)
-const COL_TREES := Color(0.045, 0.06, 0.06)
+# Dusk palette (design doc §5, "Color worlds — Dusk"). Sky/ember/treeline/fog
+# now live in RoutePalettes.spillway(); these are the canal's own materials.
 const COL_CONCRETE := Color(0.28, 0.3, 0.36)
 const COL_BACK_WALL := Color(0.2, 0.22, 0.28)
 const COL_WATER := Color(0.08, 0.12, 0.2, 0.8)
@@ -40,7 +38,8 @@ var _trick_tween: Tween
 
 
 func _ready() -> void:
-	_build_mood()
+	_build_atmosphere()
+	_build_canal_dressing()
 	_build_canal()
 	_build_eli()
 	add_child(DialogueBox.new())
@@ -311,25 +310,22 @@ func _build_mouth() -> void:
 	add_child(zone)
 
 
-func _build_mood() -> void:
-	# Sky, ember horizon, and treeline silhouettes — all far behind play.
-	var sky := _rect_poly(Vector2(5200, 1700), COL_SKY)
-	sky.position = Vector2(1700, -350)
-	sky.z_index = -20
-	add_child(sky)
+func _build_atmosphere() -> void:
+	# Shared atmosphere system: sky gradient, parallax treeline, drifting mist,
+	# embers, dusk grade. (Was inline sky/ember/treeline/fog/grade here.)
+	var atmo := Atmosphere.new()
+	atmo.config = RoutePalettes.spillway()
+	add_child(atmo)
 
-	var ember := _rect_poly(Vector2(5200, 160), COL_EMBER)
-	ember.position = Vector2(1700, -160)
-	ember.z_index = -19
-	add_child(ember)
 
-	# Back canal wall the arch lives in.
+func _build_canal_dressing() -> void:
+	# Scene-specific back wall the arch lives in, plus the kids' graffiti — these
+	# belong to the canal, not the shared atmosphere.
 	var wall := _rect_poly(Vector2(2400, 360), COL_BACK_WALL)
 	wall.position = Vector2(2380, FLOOR_Y - 180.0)
 	wall.z_index = -8
 	add_child(wall)
 
-	# Graffiti on the back wall: the kids were here first.
 	for g: Array in [
 		[Vector2(1620, FLOOR_Y - 70.0), Vector2(120, 46), Color(0.5, 0.3, 0.5, 0.55), "CR '86"],
 		[Vector2(2200, FLOOR_Y - 90.0), Vector2(170, 60), Color(0.25, 0.5, 0.5, 0.55), "SKATE THE DRAIN"],
@@ -345,46 +341,6 @@ func _build_mood() -> void:
 		l.modulate = Color(1, 1, 1, 0.4)
 		l.z_index = -7
 		add_child(l)
-
-	# Jagged treeline above the canal rim.
-	for ridge: Array in [[-300.0, 1500.0, -60.0], [2300.0, 3700.0, -40.0]]:
-		add_child(_treeline(ridge[0], ridge[1], ridge[2]))
-
-	# Low fog over the floor, drifting slowly.
-	for i in 3:
-		var fog := _rect_poly(Vector2(900, 60), COL_FOG)
-		fog.position = Vector2(1500.0 + i * 700.0, FLOOR_Y - 24.0)
-		fog.z_index = 8
-		add_child(fog)
-		var drift := create_tween().set_loops()
-		drift.tween_property(fog, "position:x", fog.position.x + 70.0, 8.0 + i * 2.0) \
-				.set_trans(Tween.TRANS_SINE)
-		drift.tween_property(fog, "position:x", fog.position.x, 8.0 + i * 2.0) \
-				.set_trans(Tween.TRANS_SINE)
-
-	# Dusk grade over the whole scene.
-	var grade := CanvasModulate.new()
-	grade.color = Color(0.84, 0.84, 1.0)
-	add_child(grade)
-
-
-func _treeline(from_x: float, to_x: float, base_y: float) -> Polygon2D:
-	var pts := PackedVector2Array([Vector2(from_x, base_y)])
-	var x := from_x
-	while x < to_x:
-		var peak_h := randf_range(60.0, 130.0)
-		var step := randf_range(50.0, 110.0)
-		pts.append(Vector2(x + step * 0.5, base_y - peak_h))
-		pts.append(Vector2(x + step, base_y - randf_range(10.0, 30.0)))
-		x += step
-	pts.append(Vector2(to_x, base_y))
-	pts.append(Vector2(to_x, base_y + 40.0))
-	pts.append(Vector2(from_x, base_y + 40.0))
-	var poly := Polygon2D.new()
-	poly.color = COL_TREES
-	poly.polygon = pts
-	poly.z_index = -15
-	return poly
 
 
 func _build_eli() -> void:
