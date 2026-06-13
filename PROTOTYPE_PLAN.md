@@ -39,9 +39,22 @@ Target: the 10–15 minute vertical slice **"The Mouth"** (design doc §10–11,
   tap-to-push at flat 185 impulse, 0.3 s cooldown, 540 cap, slopes required to
   exceed it. Keep the cap physical; reward timing inside it.
 
+## Environment & art direction
+
+- [x] **Atmosphere system** (2026-06-13): shared, config-driven environment
+  (`scripts/env/`): sky gradient, Parallax2D depth layers, CPUParticles2D,
+  color grade, foreground occluders. Procedural silhouettes now; AI-sprite
+  texture slots ready. `RoutePalettes` holds per-route palettes; F5 debug
+  readout. Applied to all three routes; Spillway's inline mood refactored onto
+  it. `tools/Capture.tscn` = windowed screenshot harness. *Awaiting human look
+  verdict + AI-sprite swap (gated on HF auth).*
+
 ## Rules
 
 - Every feature must serve the vertical slice or go to the backlog (design doc §27).
 - Movement feel gates everything: do not advance past Phase 3 until a human says
   skating is fun for 60 seconds with no objective.
-- Placeholder art only until route flow is proven.
+- ~~Placeholder art only until route flow is proven.~~ **Overridden 2026-06-13**
+  at Devin's direction: environment art direction (incl. AI-generated sprites)
+  is being done now, ahead of the movement feel verdict. Recorded in
+  `docs/superpowers/specs/2026-06-13-environment-art-direction-design.md`.
