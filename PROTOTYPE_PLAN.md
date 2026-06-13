@@ -21,6 +21,11 @@ Target: the 10–15 minute vertical slice **"The Mouth"** (design doc §10–11,
   arch + entry zone), Eli's filmed trick, camcorder glitch + ghost anomaly,
   walkie tone event, Eli enters tunnel, end card. *Awaiting human pass on mood
   and scare readability.*
+- [x] **Main Street line** (slice connective route, Zip's → Spillway): graybox
+  downhill street, low curb hazard, grind handrail, risky awning branch, optional
+  Northstar-van plate camcorder beat (`northstar_plate`, never gates). Mercy Hill's
+  post-Zip's gate now leads here; Main Street gates to the Spillway. Smoke test:
+  MainStreetSimTest. *Awaiting human feel pass on route flow + hazard placement.*
 - [ ] **Phase 7 — Tunnel Traversal**: dismount/carry/crawl/climb, door wedge.
 - [ ] **Phase 8 — Stealth Follow**: guard patrol, detection cone, hide zones, reveal.
 - [ ] **Phase 9 — Tunnel Chase**: forced escape, obstacles, flashlight cones.
