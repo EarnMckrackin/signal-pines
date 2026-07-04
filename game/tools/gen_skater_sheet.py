@@ -186,6 +186,33 @@ def pose_stand(d, breathe=0):
     limb(d, (20, 18 + b), (23, 25 + b), 2, INK)
     head(d, 21, 13 + b)
 
+def pose_crawl(d, phase):
+    # hands-and-knees, board flat on the back, contact at ground row 40
+    a = 3 if phase else 0
+    d.rectangle([12, 23, 24, 24], fill=GRIP)         # board on back
+    d.rectangle([12, 25, 24, 25], fill=DECK)
+    torso(d, (15, 31), (27, 30), 5)
+    limb(d, (27, 30), (29 - a, 40), 2, INK)          # front arm
+    limb(d, (25, 31), (21 + a, 40), 2, INK2)         # rear arm
+    limb(d, (15, 31), (12 + a, 37), 3, INK)          # thigh
+    limb(d, (12 + a, 37), (16 + a, 40), 3, INK)      # shin folded under
+    limb(d, (16, 32), (10 - a // 2, 38), 3, INK2)    # far leg trailing
+    head(d, 31, 27)
+
+def pose_climb(d, phase):
+    # on a ladder/fence face, arms overhead, board slung on the back
+    a = 3 if phase else 0
+    d.rectangle([13, 18, 15, 34], fill=DECK)         # board on back
+    d.rectangle([14, 18, 14, 34], fill=GRIP)
+    torso(d, (21, 33), (20, 21), 5)
+    limb(d, (21, 33), (25, 37), 3, INK)              # bent legs into wall
+    limb(d, (25, 37), (23, 42), 3, INK)
+    limb(d, (20, 33), (23, 38 - a), 3, INK2)
+    limb(d, (23, 38 - a), (21, 42 - a), 3, INK2)
+    limb(d, (20, 22), (24, 12 + a), 2, INK)          # reaching arms
+    limb(d, (20, 22), (16, 14 - a), 2, INK2)
+    head(d, 19, 17, face=1)
+
 POSES = [
     ("roll_0",  lambda d: pose_roll(d, 0)),
     ("roll_1",  lambda d: pose_roll(d, 1)),
@@ -204,6 +231,10 @@ POSES = [
     ("walk_3",  lambda d: pose_walk(d, 3)),
     ("stand_0", lambda d: pose_stand(d, 0)),
     ("stand_1", lambda d: pose_stand(d, 1)),
+    ("crawl_0", lambda d: pose_crawl(d, 0)),
+    ("crawl_1", lambda d: pose_crawl(d, 1)),
+    ("climb_0", lambda d: pose_climb(d, 0)),
+    ("climb_1", lambda d: pose_climb(d, 1)),
 ]
 
 def main():

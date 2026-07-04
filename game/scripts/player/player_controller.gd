@@ -28,6 +28,12 @@ var last_landing_speed_in := 0.0
 var last_landing_speed_out := 0.0
 var last_bail_reason := ""
 
+# Tunnel traversal (Phase 7). Zone counts are maintained by ClimbZone /
+# WaterZone areas; public for the debug overlay.
+var climbable_zones := 0
+var water_zones := 0
+var crawl_headroom_blocked := false
+
 # Signed speed along the floor surface (+ = screen right). Authoritative while
 # grounded: move_and_slide() flattens velocity.y on slopes, so re-deriving
 # speed from velocity every frame would silently bleed it away.
@@ -48,6 +54,9 @@ var _pre_interact_on_foot := false
 var _pre_move_velocity := Vector2.ZERO
 
 @onready var _visual: Node2D = $Visual
+@onready var _stand_shape: CollisionShape2D = $CollisionShape2D
+@onready var _crawl_shape: CollisionShape2D = $CrawlShape
+@onready var _headroom: ShapeCast2D = $HeadroomProbe
 
 
 func _ready() -> void:
@@ -81,6 +90,10 @@ func _physics_process(delta: float) -> void:
 			_process_grinding(delta)
 		SkateState.INTERACTING:
 			_process_interacting(delta)
+		SkateState.CRAWLING:
+			_process_crawling(delta)
+		SkateState.CLIMBING:
+			_process_climbing(delta)
 		SkateState.BAILING:
 			_process_bailing(delta)
 		SkateState.RECOVERING:
@@ -125,6 +138,11 @@ func _process_skating(delta: float) -> void:
 	# the surface descends to the right, so rightward speed grows downhill.
 	speed += tuning.gravity * surf.y * tuning.slope_grip * delta
 
+	# Standing water (spillway floor, tunnel puddles): heavy extra rolling
+	# drag, and kicks lose bite.
+	if water_zones > 0:
+		speed = move_toward(speed, 0.0, tuning.wet_drag * delta)
+
 	if Input.is_action_pressed("brake"):
 		if absf(speed) >= tuning.powerslide_min_speed:
 			_set_state(SkateState.POWERSLIDING)
@@ -141,7 +159,9 @@ func _process_skating(delta: float) -> void:
 		# the cooldown just keeps mashing from beating a real push rhythm.
 		if Input.is_action_just_pressed("push") and _push_cooldown == 0.0 \
 				and absf(speed) < tuning.max_push_speed:
-			speed = clampf(speed + facing * tuning.push_impulse,
+			var kick := tuning.push_impulse \
+					* (tuning.wet_push_factor if water_zones > 0 else 1.0)
+			speed = clampf(speed + facing * kick,
 					-tuning.max_push_speed, tuning.max_push_speed)
 			_push_cooldown = tuning.push_interval
 			pushed.emit()
@@ -182,6 +202,12 @@ func _process_airborne(delta: float) -> void:
 		_coyote_timer = 0.0
 		_jump_buffer = 0.0
 		velocity.y = -tuning.ollie_force_min
+
+	# Grab a climbable surface mid-jump while on foot (never mid-skate-air).
+	if _airborne_on_foot and climbable_zones > 0 \
+			and Input.is_action_pressed("push"):
+		_start_climb()
+		return
 
 	# Grind: holding brake near a rail snaps onto it (design doc §13).
 	_update_nearest_rail()
@@ -226,10 +252,20 @@ func _process_grinding(delta: float) -> void:
 
 func _process_on_foot(delta: float) -> void:
 	var lean := Input.get_axis("lean_left", "lean_right")
-	velocity.x = move_toward(velocity.x, lean * tuning.walk_speed, tuning.walk_accel * delta)
+	var walk_target := tuning.walk_speed \
+			* (tuning.wet_walk_factor if water_zones > 0 else 1.0)
+	velocity.x = move_toward(velocity.x, lean * walk_target, tuning.walk_accel * delta)
 	if absf(lean) > 0.3:
 		facing = -1 if lean < 0.0 else 1
 	if is_on_floor():
+		# Grab a climbable surface (design doc §14: chain link, ladders, pipes).
+		if climbable_zones > 0 and Input.is_action_pressed("push"):
+			_start_climb()
+			return
+		# Hold brake to drop to a crawl (low pipes, duct gaps).
+		if Input.is_action_pressed("brake"):
+			_set_state(SkateState.CRAWLING)
+			return
 		if Input.is_action_just_pressed("ollie"):
 			velocity.y = -tuning.foot_jump_force
 			_airborne_on_foot = true
@@ -241,6 +277,45 @@ func _process_on_foot(delta: float) -> void:
 			return
 	else:
 		velocity.y = minf(velocity.y + tuning.gravity * delta, tuning.max_fall_speed)
+
+
+func _process_crawling(delta: float) -> void:
+	var lean := Input.get_axis("lean_left", "lean_right")
+	var crawl_target := tuning.crawl_speed \
+			* (tuning.wet_walk_factor if water_zones > 0 else 1.0)
+	velocity.x = move_toward(velocity.x, lean * crawl_target, tuning.walk_accel * delta)
+	if absf(lean) > 0.3:
+		facing = -1 if lean < 0.0 else 1
+	if not is_on_floor():
+		velocity.y = minf(velocity.y + tuning.gravity * delta, tuning.max_fall_speed)
+	# Standing back up needs headroom: the probe sweeps the standing capsule
+	# in place, so a low ceiling keeps the crawl held (forgiving, no clipping).
+	crawl_headroom_blocked = _headroom_blocked()
+	if not Input.is_action_pressed("brake") and not crawl_headroom_blocked:
+		_set_state(SkateState.ON_FOOT)
+
+
+func _process_climbing(_delta: float) -> void:
+	var lean := Input.get_axis("lean_left", "lean_right")
+	var vy := (Input.get_action_strength("brake") - Input.get_action_strength("push")) \
+			* tuning.climb_speed
+	velocity = Vector2(lean * tuning.climb_drift, vy)
+	# Hop off: small backward push, treated as an on-foot jump.
+	if Input.is_action_just_pressed("ollie"):
+		velocity = Vector2(-facing * tuning.climb_drift, -tuning.foot_jump_force * 0.6)
+		_airborne_on_foot = true
+		_set_state(SkateState.AIRBORNE)
+		return
+	# Off the climbable surface: land if grounded, otherwise fall as on-foot.
+	if climbable_zones == 0:
+		if is_on_floor():
+			_set_state(SkateState.ON_FOOT)
+		else:
+			_airborne_on_foot = true
+			_set_state(SkateState.AIRBORNE)
+		return
+	if is_on_floor() and vy > 0.0:
+		_set_state(SkateState.ON_FOOT)
 
 
 func _process_interacting(delta: float) -> void:
@@ -310,6 +385,25 @@ func _ollie() -> void:
 	_airborne_on_foot = false
 	velocity.y = -force
 	_set_state(SkateState.AIRBORNE)
+
+
+func _start_climb() -> void:
+	crouch_charge = 0.0
+	_jump_buffer = 0.0
+	_airborne_on_foot = false
+	velocity = Vector2.ZERO
+	_set_state(SkateState.CLIMBING)
+
+
+func _headroom_blocked() -> bool:
+	# Sweeps the standing capsule in place while the crawl shape is active.
+	_headroom.force_shapecast_update()
+	return _headroom.is_colliding()
+
+
+func _set_crawl_shape(crawling: bool) -> void:
+	_stand_shape.set_deferred("disabled", crawling)
+	_crawl_shape.set_deferred("disabled", not crawling)
 
 
 func _start_grind(rail: GrindRail) -> void:
@@ -395,6 +489,11 @@ func _set_state(next: int) -> void:
 		return
 	var previous := state
 	state = next
+	if next == SkateState.CRAWLING:
+		_set_crawl_shape(true)
+	elif previous == SkateState.CRAWLING:
+		_set_crawl_shape(false)
+		crawl_headroom_blocked = false
 	state_changed.emit(previous, next)
 
 

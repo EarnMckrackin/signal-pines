@@ -29,6 +29,8 @@ const ANIMS := {
 	"recover": {"frames": [10], "fps": 1.0, "loop": true},
 	"walk":    {"frames": [11, 12, 13, 14], "fps": 7.0, "loop": true},
 	"stand":   {"frames": [15, 16], "fps": 1.6, "loop": true},
+	"crawl":   {"frames": [17, 18], "fps": 6.0, "loop": true},
+	"climb":   {"frames": [19, 20], "fps": 5.0, "loop": true},
 }
 
 @export_group("Juice")
@@ -73,9 +75,26 @@ func _physics_process(delta: float) -> void:
 	_squash = _squash.lerp(Vector2.ONE, 1.0 - exp(-squash_recover * delta))
 	scale = Vector2(DRAW_SCALE, DRAW_SCALE) * _squash
 	_set_anim(_pick_anim())
+	_scale_anim_speed()
 	_grind_sparks.emitting = _player.state == SkateState.GRINDING \
 			and absf(_player.velocity.length()) > 60.0
 	_slide_dust.emitting = _player.state == SkateState.POWERSLIDING
+
+
+func _scale_anim_speed() -> void:
+	# Crawl/climb cycles track actual movement so the player never moonwalks
+	# in place; everything else runs at authored fps.
+	match animation:
+		&"crawl":
+			speed_scale = clampf(
+				absf(_player.velocity.x) / maxf(_player.tuning.crawl_speed, 1.0),
+				0.0, 1.2)
+		&"climb":
+			speed_scale = clampf(
+				_player.velocity.length() / maxf(_player.tuning.climb_speed, 1.0),
+				0.0, 1.2)
+		_:
+			speed_scale = 1.0
 
 
 func _pick_anim() -> String:
@@ -98,6 +117,10 @@ func _pick_anim() -> String:
 			return "recover"
 		SkateState.ON_FOOT:
 			return "walk" if absf(_player.velocity.x) > 20.0 else "stand"
+		SkateState.CRAWLING:
+			return "crawl"
+		SkateState.CLIMBING:
+			return "climb"
 		SkateState.INTERACTING:
 			return "stand" if _player.velocity.length() < 20.0 else "roll"
 	return "roll"

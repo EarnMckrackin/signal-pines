@@ -5,7 +5,7 @@ extends Resource
 ## `proc_kind` (drawn procedurally as polygons until real art exists). A layer
 ## with neither is skipped.
 
-enum Kind { NONE, SKY, HILLS, TREELINE, BUILDINGS, POLES, HAZE }
+enum Kind { NONE, SKY, HILLS, TREELINE, BUILDINGS, POLES, HAZE, BRICKWALL, PIPES, VINES }
 
 ## When set, the layer renders this texture and ignores proc_kind.
 @export var texture: Texture2D

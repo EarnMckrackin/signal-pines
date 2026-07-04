@@ -113,3 +113,44 @@ static func spillway() -> AtmosphereConfig:
 				Vector2(3200, 500), 28, Color(0.9, 0.5, 0.2, 0.5)),
 	]
 	return c
+
+
+static func tunnel() -> AtmosphereConfig:
+	# Underground drainage tunnel: claustrophobic, wet, old brick with vines
+	# creeping in and utility pipes along the ceiling. No sky — the gradient
+	# is just dark concrete above and below. Heavy grain, tight vignette.
+	var c := AtmosphereConfig.new()
+	c.display_name = "Tunnel — brick interior"
+	c.sky_top = Color(0.06, 0.06, 0.08)
+	c.sky_bottom = Color(0.09, 0.08, 0.07)
+	c.grade = Color(0.82, 0.88, 0.86)
+	c.layers = [
+		# Back wall: dark brick, almost no parallax (it's right behind you).
+		_layer(AtmosphereLayer.Kind.BRICKWALL, 0.08, -28,
+				Color(0.18, 0.12, 0.1), 60.0, 4000.0, 41),
+		# Utility pipes along the ceiling, slow scroll.
+		_layer(AtmosphereLayer.Kind.PIPES, 0.15, -20,
+				Color(0.28, 0.3, 0.26), -370.0, 4000.0, 42),
+		# Vines hanging from cracks in the ceiling.
+		_layer(AtmosphereLayer.Kind.VINES, 0.25, -16,
+				Color(0.14, 0.26, 0.12), -340.0, 4000.0, 43,
+				Color(0.18, 0.32, 0.15)),
+		# Near-camera vines, darker, foreground occluder feel.
+		_layer(AtmosphereLayer.Kind.VINES, 0.9, 7,
+				Color(0.06, 0.12, 0.06), -360.0, 4000.0, 44,
+				Color(0.08, 0.14, 0.07)),
+	]
+	c.emitters = [
+		# Ceiling drips: slow fat drops.
+		_emitter(AtmosphereEmitter.Preset.DRIP, Vector2(1400, -340),
+				Vector2(3000, 40), 18, Color(0.5, 0.6, 0.7, 0.4), 5),
+		# Low mist pooling on the floor.
+		_emitter(AtmosphereEmitter.Preset.MIST, Vector2(1400, -20),
+				Vector2(3000, 80), 14, Color(0.4, 0.45, 0.5, 0.06), 7),
+		# Faint dust in the air.
+		_emitter(AtmosphereEmitter.Preset.DUST, Vector2(1400, -180),
+				Vector2(3000, 300), 20, Color(0.6, 0.55, 0.5, 0.15)),
+	]
+	c.grain = 0.08
+	c.vignette = 0.45
+	return c

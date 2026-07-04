@@ -26,7 +26,13 @@ Target: the 10–15 minute vertical slice **"The Mouth"** (design doc §10–11,
   Northstar-van plate camcorder beat (`northstar_plate`, never gates). Mercy Hill's
   post-Zip's gate now leads here; Main Street gates to the Spillway. Smoke test:
   MainStreetSimTest. *Awaiting human feel pass on route flow + hazard placement.*
-- [ ] **Phase 7 — Tunnel Traversal**: dismount/carry/crawl/climb, door wedge.
+- [x] **Phase 7 — Tunnel Traversal**: CRAWLING + CLIMBING implemented (crawl
+  shape swap + standing-headroom probe, ClimbZone/WaterZone areas, wet_* tuning
+  live, crawl/climb sprite frames, door wedge hold-[E]). Isolated toy:
+  `scenes/toys/TunnelToy.tscn` (duct → pool → ladder → wedged door → exit).
+  Smoke test: TunnelToySimTest. *Awaiting human feel pass on the toy — does
+  crawl/climb/wade feel deliberate, not sluggish? Only then does it enter the
+  Spillway tunnel.*
 - [ ] **Phase 8 — Stealth Follow**: guard patrol, detection cone, hide zones, reveal.
 - [ ] **Phase 9 — Tunnel Chase**: forced escape, obstacles, flashlight cones.
 - [ ] **Phase 10 — Bedroom Playback**: TV/VCR cutscene, Eli message, end card.

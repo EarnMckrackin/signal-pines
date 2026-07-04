@@ -3,7 +3,7 @@ extends Resource
 ## One ambient particle field in an AtmosphereConfig. Presets map to CPUParticles2D
 ## configs (GPU particles are avoided on this project's gl_compatibility renderer).
 
-enum Preset { DUST, MIST, EMBERS, RAIN, LEAVES }
+enum Preset { DUST, MIST, EMBERS, RAIN, LEAVES, DRIP }
 
 @export var preset: Preset = Preset.DUST
 ## Spawn region, centered on `region_center`, in world px.

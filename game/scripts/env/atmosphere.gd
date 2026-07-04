@@ -144,6 +144,12 @@ func _proc_layer(layer: AtmosphereLayer) -> Node2D:
 			return _skyline(layer, rng)
 		AtmosphereLayer.Kind.POLES:
 			return _poles(layer, rng)
+		AtmosphereLayer.Kind.BRICKWALL:
+			return _brickwall(layer, rng)
+		AtmosphereLayer.Kind.PIPES:
+			return _pipes(layer, rng)
+		AtmosphereLayer.Kind.VINES:
+			return _vines(layer, rng)
 	return Node2D.new()
 
 
@@ -251,6 +257,117 @@ func _poles(layer: AtmosphereLayer, rng: RandomNumberGenerator) -> Node2D:
 	return root
 
 
+func _brickwall(layer: AtmosphereLayer, rng: RandomNumberGenerator) -> Node2D:
+	# Dense brick pattern: rows of alternating-offset rectangles with mortar
+	# gaps. Slow to build many polys, so drawn as horizontal bands with
+	# vertical mortar cuts — reads as brick at game-camera distance.
+	var root := Node2D.new()
+	var from_x := -layer.proc_span * 0.5
+	var to_x := layer.proc_span * 0.5
+	var base_y := layer.proc_base_y
+	var row_h := 14.0
+	var mortar := 2.0
+	var brick_w := 32.0
+	var y := base_y
+	var row := 0
+	while y > base_y - 600.0:
+		var offset := (brick_w * 0.5) if (row % 2 == 1) else 0.0
+		var x := from_x + offset
+		while x < to_x:
+			var w := minf(brick_w - mortar, to_x - x)
+			if w < 6.0:
+				x += brick_w
+				continue
+			var shade := rng.randf_range(-0.03, 0.03)
+			var col: Color = layer.proc_color
+			col = Color(col.r + shade, col.g + shade * 0.7, col.b + shade * 0.5)
+			var brick := Polygon2D.new()
+			brick.color = col
+			brick.polygon = PackedVector2Array([
+				Vector2(x, y - row_h + mortar), Vector2(x + w, y - row_h + mortar),
+				Vector2(x + w, y), Vector2(x, y)])
+			root.add_child(brick)
+			x += brick_w
+		y -= row_h
+		row += 1
+	return root
+
+
+func _pipes(layer: AtmosphereLayer, rng: RandomNumberGenerator) -> Node2D:
+	# Horizontal utility pipes running along the ceiling / upper wall.
+	var root := Node2D.new()
+	var from_x := -layer.proc_span * 0.5
+	var to_x := layer.proc_span * 0.5
+	var y := layer.proc_base_y
+	for i in range(rng.randi_range(2, 4)):
+		var pipe_y := y + rng.randf_range(0.0, 60.0)
+		var radius := rng.randf_range(4.0, 9.0)
+		var pipe := Polygon2D.new()
+		pipe.color = layer.proc_color.darkened(rng.randf_range(0.0, 0.15))
+		pipe.polygon = PackedVector2Array([
+			Vector2(from_x, pipe_y - radius), Vector2(to_x, pipe_y - radius),
+			Vector2(to_x, pipe_y + radius), Vector2(from_x, pipe_y + radius)])
+		root.add_child(pipe)
+		# Highlight strip on top edge
+		var rim := Polygon2D.new()
+		rim.color = layer.proc_color.lightened(0.25)
+		rim.polygon = PackedVector2Array([
+			Vector2(from_x, pipe_y - radius), Vector2(to_x, pipe_y - radius),
+			Vector2(to_x, pipe_y - radius + 2), Vector2(from_x, pipe_y - radius + 2)])
+		root.add_child(rim)
+		# Brackets every 200-400 px
+		var bx := from_x + rng.randf_range(60.0, 120.0)
+		while bx < to_x:
+			var bracket := Polygon2D.new()
+			bracket.color = layer.proc_color.darkened(0.2)
+			bracket.polygon = PackedVector2Array([
+				Vector2(bx - 3, pipe_y - radius - 6),
+				Vector2(bx + 3, pipe_y - radius - 6),
+				Vector2(bx + 3, pipe_y + radius + 2),
+				Vector2(bx - 3, pipe_y + radius + 2)])
+			root.add_child(bracket)
+			bx += rng.randf_range(200.0, 400.0)
+		y += 30.0
+	return root
+
+
+func _vines(layer: AtmosphereLayer, rng: RandomNumberGenerator) -> Node2D:
+	# Organic tendrils hanging from the ceiling: thin lines with small leaf
+	# clusters, slightly swaying in the scene but static here.
+	var root := Node2D.new()
+	var from_x := -layer.proc_span * 0.5
+	var to_x := layer.proc_span * 0.5
+	var x := from_x + rng.randf_range(30.0, 80.0)
+	while x < to_x:
+		var vine_len := rng.randf_range(40.0, 160.0)
+		var anchor_y := layer.proc_base_y
+		# Main stem
+		var stem := Polygon2D.new()
+		stem.color = layer.proc_color
+		stem.polygon = PackedVector2Array([
+			Vector2(x - 1, anchor_y), Vector2(x + 1, anchor_y),
+			Vector2(x + rng.randf_range(-6, 6), anchor_y + vine_len),
+			Vector2(x + rng.randf_range(-6, 6) - 2, anchor_y + vine_len)])
+		root.add_child(stem)
+		# Leaf clusters along the stem
+		var ly := anchor_y + 16.0
+		while ly < anchor_y + vine_len - 8.0:
+			var lx := x + rng.randf_range(-8.0, 8.0)
+			var leaf := Polygon2D.new()
+			var leaf_col: Color = layer.proc_color_alt if rng.randf() > 0.4 \
+					else layer.proc_color.lightened(0.1)
+			leaf.color = leaf_col
+			var lw := rng.randf_range(3.0, 7.0)
+			var lh := rng.randf_range(3.0, 6.0)
+			leaf.polygon = PackedVector2Array([
+				Vector2(lx, ly), Vector2(lx + lw, ly + lh * 0.3),
+				Vector2(lx + lw * 0.6, ly + lh), Vector2(lx - 2, ly + lh * 0.7)])
+			root.add_child(leaf)
+			ly += rng.randf_range(14.0, 28.0)
+		x += rng.randf_range(60.0, 180.0)
+	return root
+
+
 # --- Particles --------------------------------------------------------------
 
 
@@ -316,6 +433,15 @@ func _configure_preset(p: CPUParticles2D, preset: int) -> void:
 			p.angular_velocity_max = 120.0
 			p.scale_amount_min = 2.0
 			p.scale_amount_max = 4.0
+		AtmosphereEmitter.Preset.DRIP:
+			p.lifetime = 1.8
+			p.gravity = Vector2(0, 340)
+			p.direction = Vector2(0, 1)
+			p.spread = 4.0
+			p.initial_velocity_min = 4.0
+			p.initial_velocity_max = 20.0
+			p.scale_amount_min = 1.0
+			p.scale_amount_max = 1.5
 
 
 # --- Debug ------------------------------------------------------------------

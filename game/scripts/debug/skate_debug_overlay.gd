@@ -21,7 +21,7 @@ func _process(_delta: float) -> void:
 	var charge_pct := 0.0
 	if _player.tuning.crouch_charge_time > 0.0:
 		charge_pct = 100.0 * _player.crouch_charge / _player.tuning.crouch_charge_time
-	_label.text = "state: %s\nspeed: %.0f\nvel: (%.0f, %.0f)\ngrounded: %s\nslope: %s\nlean: %.1f\nfacing: %d\ncharge: %.0f%%\nlanding: %s\nbail: %s\ngrind: %s\nflags: %s\nevidence: %s\nfps: %d" % [
+	_label.text = "state: %s\nspeed: %.0f\nvel: (%.0f, %.0f)\ngrounded: %s\nslope: %s\nlean: %.1f\nfacing: %d\ncharge: %.0f%%\nlanding: %s\nbail: %s\ngrind: %s\ntunnel: climb_zones=%d water=%d headroom_blocked=%s\nflags: %s\nevidence: %s\nfps: %d" % [
 		SkateState.NAMES.get(_player.state, "?"),
 		_player.velocity.length(),
 		_player.velocity.x, _player.velocity.y,
@@ -33,6 +33,8 @@ func _process(_delta: float) -> void:
 		_landing_text(),
 		_player.last_bail_reason if _player.last_bail_reason != "" else "-",
 		_grind_text(),
+		_player.climbable_zones, _player.water_zones,
+		_player.crawl_headroom_blocked,
 		", ".join(GameState.flags.keys()) if not GameState.flags.is_empty() else "-",
 		", ".join(GameState.evidence) if not GameState.evidence.is_empty() else "-",
 		Engine.get_frames_per_second(),
