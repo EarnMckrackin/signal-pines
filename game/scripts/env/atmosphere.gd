@@ -28,6 +28,7 @@ func _ready() -> void:
 		_build_emitter(emitter)
 	for occ in config.occluders:
 		_build_layer(occ)
+	_build_grain()
 	_build_debug()
 
 
@@ -71,6 +72,25 @@ func _build_sky() -> void:
 	sky.name = "Sky"
 	sky.add_child(rect)
 	add_child(sky)
+
+
+func _build_grain() -> void:
+	# Screen-fixed grain + vignette above the world, below debug UI.
+	if config.grain <= 0.0 and config.vignette <= 0.0:
+		return
+	var mat := ShaderMaterial.new()
+	mat.shader = load("res://shaders/film_grain.gdshader")
+	mat.set_shader_parameter("grain_amount", config.grain)
+	mat.set_shader_parameter("vignette_amount", config.vignette)
+	var rect := ColorRect.new()
+	rect.material = mat
+	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var layer := CanvasLayer.new()
+	layer.layer = 40
+	layer.name = "Grain"
+	layer.add_child(rect)
+	add_child(layer)
 
 
 func _build_grade() -> void:

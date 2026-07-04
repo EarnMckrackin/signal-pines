@@ -7,6 +7,8 @@ extends CharacterBody2D
 ## Extension points: gadgets/animation listen to state_changed.
 
 signal state_changed(previous: int, current: int)
+## Emitted on each skate kick; presentation (animation, dust) listens.
+signal pushed
 
 @export var tuning: SkateTuning
 
@@ -46,8 +48,6 @@ var _pre_interact_on_foot := false
 var _pre_move_velocity := Vector2.ZERO
 
 @onready var _visual: Node2D = $Visual
-@onready var _body_poly: Polygon2D = $Visual/Body
-@onready var _board: Polygon2D = $Visual/Board
 
 
 func _ready() -> void:
@@ -144,6 +144,7 @@ func _process_skating(delta: float) -> void:
 			speed = clampf(speed + facing * tuning.push_impulse,
 					-tuning.max_push_speed, tuning.max_push_speed)
 			_push_cooldown = tuning.push_interval
+			pushed.emit()
 		# Gentle tic-tac accel so the player can start or turn around from rest.
 		speed += lean * tuning.lean_accel * delta
 
@@ -423,14 +424,5 @@ func _update_visual(delta: float) -> void:
 		_visual.rotation = lerp_angle(_visual.rotation, target_rot, 12.0 * delta)
 
 	_visual.scale.x = float(facing)
-
-	var crouched := state == SkateState.CROUCHING or state == SkateState.POWERSLIDING
-	_body_poly.scale.y = lerpf(_body_poly.scale.y, 0.6 if crouched else 1.0, 14.0 * delta)
-	# On foot the board tucks under the arm instead of vanishing — walking is
-	# real traversal, and the board staying visible keeps it central.
-	var on_foot := state == SkateState.ON_FOOT \
-			or (state == SkateState.INTERACTING and _pre_interact_on_foot)
-	var board_pos := Vector2(-13, -14) if on_foot else Vector2(0, 24)
-	var board_rot := 1.25 if on_foot else 0.0
-	_board.position = _board.position.lerp(board_pos, 14.0 * delta)
-	_board.rotation = lerp_angle(_board.rotation, board_rot, 14.0 * delta)
+	# Pose, crouch squash, and board carry are sprite frames now — see
+	# scripts/player/player_visuals.gd on $Visual/Sprite.

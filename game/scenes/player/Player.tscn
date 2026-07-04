@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/camera/cinematic_camera.gd" id="2"]
 [ext_resource type="Script" path="res://scripts/debug/skate_debug_overlay.gd" id="3"]
 [ext_resource type="Script" path="res://scripts/gadgets/camcorder.gd" id="4"]
 [ext_resource type="Script" path="res://scripts/debug/tuning_panel.gd" id="5"]
+[ext_resource type="Script" path="res://scripts/player/player_visuals.gd" id="6"]
 
 [sub_resource type="CapsuleShape2D" id="cap"]
 radius = 12.0
@@ -19,14 +20,9 @@ shape = SubResource("cap")
 [node name="Visual" type="Node2D" parent="."]
 z_index = 5
 
-[node name="Body" type="Polygon2D" parent="Visual"]
-color = Color(0.9, 0.35, 0.3, 1)
-polygon = PackedVector2Array(-10, -26, 10, -26, 10, 18, -10, 18)
-
-[node name="Board" type="Polygon2D" parent="Visual"]
-position = Vector2(0, 24)
-color = Color(0.2, 0.8, 0.9, 1)
-polygon = PackedVector2Array(-22, -3, 22, -3, 22, 3, -22, 3)
+[node name="Sprite" type="AnimatedSprite2D" parent="Visual"]
+scale = Vector2(2, 2)
+script = ExtResource("6")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 script = ExtResource("2")

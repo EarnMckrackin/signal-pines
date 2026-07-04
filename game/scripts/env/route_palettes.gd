@@ -38,24 +38,33 @@ static func _emitter(preset: AtmosphereEmitter.Preset, center: Vector2,
 
 
 static func mercy_hill() -> AtmosphereConfig:
-	# Daytime PNW: pale overcast sky, layered evergreen ridges, dust in the air.
+	# Overcast PNW afternoon, drizzle coming down the ridge: layered evergreen
+	# silhouettes, a haze band between them, mist pooling near the road, light
+	# rain, and a film-grain finish. Muted, damp, 1986.
 	var c := AtmosphereConfig.new()
-	c.display_name = "Mercy Hill — day"
-	c.sky_top = Color(0.55, 0.62, 0.7)
-	c.sky_bottom = Color(0.78, 0.8, 0.79)
-	c.grade = Color(1.0, 0.99, 0.95)
+	c.display_name = "Mercy Hill — overcast drizzle"
+	c.sky_top = Color(0.42, 0.5, 0.58)
+	c.sky_bottom = Color(0.68, 0.7, 0.67)
+	c.grade = Color(0.93, 0.96, 0.97)
 	c.layers = [
-		_layer(AtmosphereLayer.Kind.HILLS, 0.15, -30, Color(0.4, 0.48, 0.52), -120.0, 11000.0, 11),
-		_layer(AtmosphereLayer.Kind.TREELINE, 0.35, -25, Color(0.22, 0.32, 0.3), -40.0, 11000.0, 12),
-		_layer(AtmosphereLayer.Kind.TREELINE, 0.55, -18, Color(0.13, 0.21, 0.18), 40.0, 11000.0, 13),
+		_layer(AtmosphereLayer.Kind.HILLS, 0.12, -32, Color(0.44, 0.52, 0.56), -140.0, 11000.0, 11),
+		_layer(AtmosphereLayer.Kind.TREELINE, 0.3, -26, Color(0.26, 0.35, 0.34), -50.0, 11000.0, 12),
+		_layer(AtmosphereLayer.Kind.HAZE, 0.42, -22, Color(0.62, 0.67, 0.68, 0.35), 60.0, 11000.0),
+		_layer(AtmosphereLayer.Kind.TREELINE, 0.55, -18, Color(0.12, 0.19, 0.17), 40.0, 11000.0, 13),
 	]
 	c.emitters = [
+		_emitter(AtmosphereEmitter.Preset.RAIN, Vector2(2200, -400),
+				Vector2(5600, 200), 70, Color(0.75, 0.8, 0.86, 0.2), 7),
+		_emitter(AtmosphereEmitter.Preset.MIST, Vector2(2200, 340),
+				Vector2(5200, 140), 16, Color(0.72, 0.76, 0.78, 0.08), 7),
 		_emitter(AtmosphereEmitter.Preset.DUST, Vector2(2200, 200),
-				Vector2(5200, 700), 46, Color(1.0, 0.97, 0.85, 0.32)),
+				Vector2(5200, 700), 30, Color(0.9, 0.92, 0.88, 0.2)),
 	]
 	c.occluders = [
 		_layer(AtmosphereLayer.Kind.POLES, 1.25, 8, Color(0.07, 0.08, 0.09), 360.0, 11000.0, 14),
 	]
+	c.grain = 0.055
+	c.vignette = 0.3
 	return c
 
 

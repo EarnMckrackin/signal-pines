@@ -14,3 +14,7 @@ extends Resource
 @export var layers: Array[AtmosphereLayer] = []
 @export var emitters: Array[AtmosphereEmitter] = []
 @export var occluders: Array[AtmosphereLayer] = []
+## Screen-space film grain strength (0 = off). ~0.05 reads as VHS-adjacent air.
+@export var grain := 0.0
+## Screen-edge vignette strength (0 = off). Frames the route cinematically.
+@export var vignette := 0.0
